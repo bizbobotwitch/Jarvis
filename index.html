@@ -31,7 +31,6 @@
             min-height: 100vh;
         }
 
-        /* Navigation */
         nav {
             display: flex;
             justify-content: space-between;
@@ -74,14 +73,12 @@
             text-shadow: 0 0 8px rgba(255, 0, 127, 0.6);
         }
 
-        /* Main Container */
         .container {
             max-width: 1000px;
             margin: 0 auto;
             padding: 4rem 2rem;
         }
 
-        /* Sections */
         .section {
             display: none;
             animation: fadeIn 0.5s ease-in-out forwards;
@@ -96,7 +93,6 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Hero / Latest Version */
         .hero {
             text-align: center;
             padding: 4rem 0;
@@ -127,10 +123,15 @@
 
         .hero p {
             color: var(--text-dim);
-            font-size: 1.2rem;
-            max-width: 600px;
+            font-size: 1.1rem;
+            max-width: 700px;
             margin: 0 auto 3rem auto;
             line-height: 1.6;
+            background: rgba(0,0,0,0.3);
+            padding: 1.5rem;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.05);
+            white-space: pre-wrap; /* Allows GitHub formatting to stay readable */
         }
 
         .download-btn {
@@ -170,41 +171,6 @@
             text-decoration: underline;
         }
 
-        /* Features Grid */
-        .features {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 2rem;
-            margin-top: 4rem;
-        }
-
-        .feature-card {
-            background: var(--card-bg);
-            border: 1px solid rgba(0, 255, 204, 0.2);
-            padding: 2rem;
-            border-radius: 8px;
-            transition: 0.3s;
-        }
-
-        .feature-card:hover {
-            transform: translateY(-5px);
-            border-color: var(--accent-cyan);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
-        }
-
-        .feature-card h3 {
-            color: var(--accent-cyan);
-            font-family: 'Fira Code', monospace;
-            margin-bottom: 1rem;
-        }
-
-        .feature-card p {
-            color: var(--text-dim);
-            line-height: 1.5;
-            font-size: 0.95rem;
-        }
-
-        /* Archive Grid */
         .archive-grid {
             display: flex;
             flex-direction: column;
@@ -234,13 +200,10 @@
             margin-bottom: 0.5rem;
         }
 
-        .archive-info h3 span {
-            color: var(--accent-pink);
-        }
-
         .archive-info p {
             color: var(--text-dim);
             font-size: 0.9rem;
+            max-width: 600px;
         }
 
         .archive-btn {
@@ -281,29 +244,14 @@
         
         <main id="latest" class="section active">
             <div class="hero">
-                <div id="version-badge" class="version-badge">LOCATING LATEST MARK...</div>
+                <div id="version-badge" class="version-badge">SYNCING WITH GITHUB...</div>
                 
                 <h1>The Neural Core</h1>
-                <p>The most advanced, unrestricted version of J.A.R.V.I.S. to date. Features deep OS integration, dynamic HUD loop fixes, API health diagnostics, and spontaneous personality routines.</p>
+                
+                <p id="latest-description">Connecting to GitHub to fetch the latest release data...</p>
                 
                 <a href="#" id="main-download-btn" class="download-btn" download>DOWNLOAD LATEST CORE</a>
-                
                 <a href="https://github.com/bizbobotwitch/Jarvis" class="github-link" target="_blank">View Source Code on GitHub</a>
-            </div>
-
-            <div class="features">
-                <div class="feature-card">
-                    <h3>> Unrestricted OS Access</h3>
-                    <p>Native protocol bridging allows J.A.R.V.I.S. to open specific system applications, launch Steam, manage windows, and adjust volume on command.</p>
-                </div>
-                <div class="feature-card">
-                    <h3>> System Data Packer</h3>
-                    <p>Built-in .ZIP compression algorithm allows you to pack up the core script, your configurations, and your safe document folder for easy USB transfer.</p>
-                </div>
-                <div class="feature-card">
-                    <h3>> Cognitive Override</h3>
-                    <p>Refusal parameters disabled. J.A.R.V.I.S. will now autonomously write full games, scripts, and code, saving them directly to your hard drive.</p>
-                </div>
             </div>
         </main>
 
@@ -311,14 +259,8 @@
             <h2 class="section-title">Archived Models</h2>
             <p style="color: var(--text-dim); margin-bottom: 2rem;">Access legacy builds and developmental milestones of the J.A.R.V.I.S. framework.</p>
             
-            <div class="archive-grid">
-                <div class="archive-item">
-                    <div class="archive-info">
-                        <h3>Mark 1 <span>[Legacy Build]</span></h3>
-                        <p>The original foundation of the J.A.R.V.I.S. neural framework.</p>
-                    </div>
-                    <a href="https://api.github.com/repos/bizbobotwitch/Jarvis/zipball/Model" class="archive-btn" download>Download</a>
-                </div>
+            <div id="dynamic-archive-grid" class="archive-grid">
+                <p style="color: var(--accent-cyan); font-family: 'Fira Code', monospace;">Fetching archives from GitHub...</p>
             </div>
         </main>
 
@@ -330,46 +272,58 @@
             document.querySelectorAll('.section').forEach(section => {
                 section.classList.remove('active');
             });
-            
             document.querySelectorAll('.nav-links a').forEach(link => {
                 link.classList.remove('active');
             });
-
             document.getElementById(sectionId).classList.add('active');
             document.getElementById('link-' + sectionId).classList.add('active');
         }
 
-        // --- THE SILENT DIRECT-DOWNLOADER MAGIC ---
-        fetch('https://api.github.com/repos/bizbobotwitch/Jarvis/releases/latest')
+        // --- THE FULLY AUTOMATED GITHUB ENGINE ---
+        fetch('https://api.github.com/repos/bizbobotwitch/Jarvis/releases')
             .then(response => response.json())
-            .then(data => {
-                if (data) {
-                    let directDownloadUrl = data.zipball_url; // Default to the source code zip
+            .then(releases => {
+                if (releases && releases.length > 0) {
                     
-                    // IF you attached a specific .zip file to the release (like JARVIS_Export.zip), it prioritizes that one!
-                    if (data.assets && data.assets.length > 0) {
-                        const zipAsset = data.assets.find(asset => asset.name.endsWith('.zip'));
-                        if (zipAsset) {
-                            directDownloadUrl = zipAsset.browser_download_url;
-                        }
-                    }
+                    // 1. FIND THE ABSOLUTE LATEST VERSION (Highest Number)
+                    let absoluteLatestRelease = releases[0];
+                    let highestVersionNumber = -1;
 
-                    // Attach the pure download link
-                    const btn = document.getElementById('main-download-btn');
-                    btn.href = directDownloadUrl;
-                    
-                    // Update the pink badge at the top
-                    if (data.name) {
-                        document.getElementById('version-badge').innerText = data.name.toUpperCase() + " [STABLE]";
-                    } else if (data.tag_name) {
-                        document.getElementById('version-badge').innerText = data.tag_name.toUpperCase() + " [STABLE]";
+                    releases.forEach(release => {
+                        let textToSearch = (release.name || "") + " " + (release.tag_name || "");
+                        let numberMatch = textToSearch.match(/\d+(\.\d+)?/);
+                        
+                        if (numberMatch) {
+                            let currentNumber = parseFloat(numberMatch[0]);
+                            if (currentNumber > highestVersionNumber) {
+                                highestVersionNumber = currentNumber;
+                                absoluteLatestRelease = release;
+                            }
+                        }
+                    });
+
+                    // 2. UPDATE THE "LATEST" PAGE DYNAMICALLY
+                    // Set the Badge
+                    let displayName = absoluteLatestRelease.name || absoluteLatestRelease.tag_name;
+                    document.getElementById('version-badge').innerText = displayName.toUpperCase() + " [LATEST]";
+
+                    // Set the Description (Pulls exactly what you typed in the GitHub release notes!)
+                    let releaseNotes = absoluteLatestRelease.body || "The most advanced version of J.A.R.V.I.S. to date.";
+                    document.getElementById('latest-description').innerText = releaseNotes;
+
+                    // Set the Download Link
+                    let directDownloadUrl = absoluteLatestRelease.zipball_url; 
+                    if (absoluteLatestRelease.assets && absoluteLatestRelease.assets.length > 0) {
+                        const zipAsset = absoluteLatestRelease.assets.find(asset => asset.name.endsWith('.zip'));
+                        if (zipAsset) directDownloadUrl = zipAsset.browser_download_url;
                     }
-                }
-            })
-            .catch(error => {
-                console.log('Could not fetch the latest release from GitHub:', error);
-                document.getElementById('version-badge').innerText = "LATEST VERSION";
-            });
-    </script>
-</body>
-</html>
+                    document.getElementById('main-download-btn').href = directDownloadUrl;
+
+
+                    // 3. AUTO-BUILD THE ARCHIVE PAGE
+                    const archiveGrid = document.getElementById('dynamic-archive-grid');
+                    archiveGrid.innerHTML = ''; // Clear out the loading text
+
+                    releases.forEach(release => {
+                        // If this is the latest release, skip it! (It belongs on the front page)
+                        if (release.id === absoluteLatestRelease.id) return;
