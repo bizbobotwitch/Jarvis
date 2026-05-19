@@ -131,7 +131,7 @@
             padding: 1.5rem;
             border-radius: 8px;
             border: 1px solid rgba(255,255,255,0.05);
-            white-space: pre-wrap; /* Allows GitHub formatting to stay readable */
+            white-space: pre-wrap;
         }
 
         .download-btn {
@@ -169,6 +169,39 @@
         .github-link:hover {
             color: var(--accent-cyan);
             text-decoration: underline;
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-top: 4rem;
+        }
+
+        .feature-card {
+            background: var(--card-bg);
+            border: 1px solid rgba(0, 255, 204, 0.2);
+            padding: 2rem;
+            border-radius: 8px;
+            transition: 0.3s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent-cyan);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .feature-card h3 {
+            color: var(--accent-cyan);
+            font-family: 'Fira Code', monospace;
+            margin-bottom: 1rem;
+        }
+
+        .feature-card p {
+            color: var(--text-dim);
+            line-height: 1.5;
+            font-size: 0.95rem;
         }
 
         .archive-grid {
@@ -244,14 +277,28 @@
         
         <main id="latest" class="section active">
             <div class="hero">
-                <div id="version-badge" class="version-badge">SYNCING WITH GITHUB...</div>
+                <div id="version-badge" class="version-badge">SYNCING WITH REPOSITORY...</div>
                 
                 <h1>The Neural Core</h1>
-                
-                <p id="latest-description">Connecting to GitHub to fetch the latest release data...</p>
+                <p id="latest-description">Connecting to GitHub to verify version states and pull release deployment documentation...</p>
                 
                 <a href="#" id="main-download-btn" class="download-btn" download>DOWNLOAD LATEST CORE</a>
                 <a href="https://github.com/bizbobotwitch/Jarvis" class="github-link" target="_blank">View Source Code on GitHub</a>
+            </div>
+
+            <div class="features">
+                <div class="feature-card">
+                    <h3>> Unrestricted OS Access</h3>
+                    <p>Native protocol bridging allows J.A.R.V.I.S. to open specific system applications, launch Steam, manage windows, and adjust volume on command.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>> System Data Packer</h3>
+                    <p>Built-in .ZIP compression algorithm allows you to pack up the core script, your configurations, and your safe document folder for easy USB transfer.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>> Cognitive Override</h3>
+                    <p>Refusal parameters disabled. J.A.R.V.I.S. will now autonomously write full games, scripts, and code, saving them directly to your hard drive.</p>
+                </div>
             </div>
         </main>
 
@@ -260,14 +307,13 @@
             <p style="color: var(--text-dim); margin-bottom: 2rem;">Access legacy builds and developmental milestones of the J.A.R.V.I.S. framework.</p>
             
             <div id="dynamic-archive-grid" class="archive-grid">
-                <p style="color: var(--accent-cyan); font-family: 'Fira Code', monospace;">Fetching archives from GitHub...</p>
+                <p style="color: var(--accent-cyan); font-family: 'Fira Code', monospace;">Compiling historic core logs...</p>
             </div>
         </main>
 
     </div>
 
     <script>
-        // Tab Switching Logic
         function showSection(sectionId) {
             document.querySelectorAll('.section').forEach(section => {
                 section.classList.remove('active');
@@ -279,51 +325,120 @@
             document.getElementById('link-' + sectionId).classList.add('active');
         }
 
-        // --- THE FULLY AUTOMATED GITHUB ENGINE ---
-        fetch('https://api.github.com/repos/bizbobotwitch/Jarvis/releases')
-            .then(response => response.json())
-            .then(releases => {
-                if (releases && releases.length > 0) {
+        async function syncWithGitHub() {
+            try {
+                const apiUrl = 'https://api.github.com/repos/bizbobotwitch/Jarvis/releases?t=' + new Date().getTime();
+                const response = await fetch(apiUrl);
+                
+                if (!response.ok) {
+                    throw new Error("GitHub API transaction limit reached or channel blocked.");
+                }
+                
+                const releases = await response.json();
+                
+                if (!releases || releases.length === 0) {
+                    throw new Error("Target repository indicates empty release states.");
+                }
+
+                let absoluteLatestRelease = releases[0];
+                let highestVersionNumber = -1;
+
+                releases.forEach(release => {
+                    let textToSearch = (release.name || "") + " " + (release.tag_name || "");
+                    let numberMatch = textToSearch.match(/\d+(\.\d+)?/);
                     
-                    // 1. FIND THE ABSOLUTE LATEST VERSION (Highest Number)
-                    let absoluteLatestRelease = releases[0];
-                    let highestVersionNumber = -1;
+                    if (numberMatch) {
+                        let currentNumber = parseFloat(numberMatch[0]);
+                        if (currentNumber > highestVersionNumber) {
+                            highestVersionNumber = currentNumber;
+                            absoluteLatestRelease = release;
+                        }
+                    }
+                });
+
+                if (highestVersionNumber === -1) absoluteLatestRelease = releases[0];
+
+                let displayName = absoluteLatestRelease.name || absoluteLatestRelease.tag_name || "STABLE BUILD";
+                const badge = document.getElementById('version-badge');
+                if(badge) badge.innerText = displayName.toUpperCase() + " [LATEST]";
+
+                let releaseNotes = absoluteLatestRelease.body || "Production build of the J.A.R.V.I.S. neural network environment.";
+                const desc = document.getElementById('latest-description');
+                if(desc) desc.innerText = releaseNotes;
+
+                let directDownloadUrl = absoluteLatestRelease.zipball_url; 
+                if (absoluteLatestRelease.assets && absoluteLatestRelease.assets.length > 0) {
+                    const zipAsset = absoluteLatestRelease.assets.find(asset => asset.name.endsWith('.zip'));
+                    if (zipAsset) directDownloadUrl = zipAsset.browser_download_url;
+                }
+                
+                const mainBtn = document.getElementById('main-download-btn');
+                if (mainBtn) {
+                    mainBtn.href = directDownloadUrl;
+                }
+
+                const archiveGrid = document.getElementById('dynamic-archive-grid');
+                if (archiveGrid) {
+                    archiveGrid.innerHTML = ''; 
+                    let archiveCount = 0;
 
                     releases.forEach(release => {
-                        let textToSearch = (release.name || "") + " " + (release.tag_name || "");
-                        let numberMatch = textToSearch.match(/\d+(\.\d+)?/);
+                        if (release.id === absoluteLatestRelease.id) return;
+
+                        archiveCount++;
+                        let archName = release.name || release.tag_name || "Legacy Architecture";
+                        let archNotes = release.body || "Archived version infrastructure.";
                         
-                        if (numberMatch) {
-                            let currentNumber = parseFloat(numberMatch[0]);
-                            if (currentNumber > highestVersionNumber) {
-                                highestVersionNumber = currentNumber;
-                                absoluteLatestRelease = release;
-                            }
+                        if (archNotes.length > 120) archNotes = archNotes.substring(0, 120) + "...";
+
+                        let archDownloadUrl = release.zipball_url;
+                        if (release.assets && release.assets.length > 0) {
+                            const zAsset = release.assets.find(a => a.name.endsWith('.zip'));
+                            if (zAsset) archDownloadUrl = zAsset.browser_download_url;
                         }
+
+                        const itemDiv = document.createElement('div');
+                        itemDiv.className = 'archive-item';
+                        itemDiv.innerHTML = `
+                            <div class="archive-info">
+                                <h3>${archName}</h3>
+                                <p>${archNotes}</p>
+                            </div>
+                            <a href="${archDownloadUrl}" class="archive-btn" download>Download</a>
+                        `;
+                        archiveGrid.appendChild(itemDiv);
                     });
 
-                    // 2. UPDATE THE "LATEST" PAGE DYNAMICALLY
-                    // Set the Badge
-                    let displayName = absoluteLatestRelease.name || absoluteLatestRelease.tag_name;
-                    document.getElementById('version-badge').innerText = displayName.toUpperCase() + " [LATEST]";
-
-                    // Set the Description (Pulls exactly what you typed in the GitHub release notes!)
-                    let releaseNotes = absoluteLatestRelease.body || "The most advanced version of J.A.R.V.I.S. to date.";
-                    document.getElementById('latest-description').innerText = releaseNotes;
-
-                    // Set the Download Link
-                    let directDownloadUrl = absoluteLatestRelease.zipball_url; 
-                    if (absoluteLatestRelease.assets && absoluteLatestRelease.assets.length > 0) {
-                        const zipAsset = absoluteLatestRelease.assets.find(asset => asset.name.endsWith('.zip'));
-                        if (zipAsset) directDownloadUrl = zipAsset.browser_download_url;
+                    if (archiveCount === 0) {
+                        archiveGrid.innerHTML = '<p style="color: var(--text-dim); font-family: monospace;">No archived models found in remote ledger.</p>';
                     }
-                    document.getElementById('main-download-btn').href = directDownloadUrl;
+                }
 
+            } catch (error) {
+                console.error("Sync Failure:", error);
+                
+                const badge = document.getElementById('version-badge');
+                if(badge) badge.innerText = "LOCAL OVERRIDE MODE";
+                
+                const desc = document.getElementById('latest-description');
+                if(desc) desc.innerText = "Automated repository sync is experiencing rate limitation. File access remains fully functional via manual release index mapping.";
+                
+                const btn = document.getElementById('main-download-btn');
+                if(btn) {
+                    btn.href = "https://github.com/bizbobotwitch/Jarvis/releases";
+                    btn.innerText = "OPEN MANUAL RELEASES";
+                    btn.removeAttribute('download'); 
+                    btn.target = "_blank"; 
+                }
+                
+                const archiveGrid = document.getElementById('dynamic-archive-grid');
+                if(archiveGrid) {
+                    archiveGrid.innerHTML = '<p style="color: #FF007F; font-family: monospace;">Synchronizer offline. Older versions available directly through manual repository ledger access.</p>';
+                }
+            }
+        }
 
-                    // 3. AUTO-BUILD THE ARCHIVE PAGE
-                    const archiveGrid = document.getElementById('dynamic-archive-grid');
-                    archiveGrid.innerHTML = ''; // Clear out the loading text
-
-                    releases.forEach(release => {
-                        // If this is the latest release, skip it! (It belongs on the front page)
-                        if (release.id === absoluteLatestRelease.id) return;
+        syncWithGitHub();
+    </script>
+</body>
+</html>
