@@ -113,6 +113,7 @@
             font-weight: 700;
             margin-bottom: 1.5rem;
             box-shadow: 0 0 15px rgba(255, 0, 127, 0.2);
+            transition: 0.3s;
         }
 
         .hero h1 {
@@ -139,12 +140,14 @@
             text-decoration: none;
             font-family: 'Fira Code', monospace;
             font-weight: 700;
-            font-size: 1.2rem;
-            padding: 1rem 3rem;
+            font-size: 1.4rem;
+            padding: 1.2rem 3.5rem;
             border-radius: 4px;
             transition: all 0.3s;
             border: 2px solid var(--accent-cyan);
             box-shadow: 0 0 20px rgba(0, 255, 204, 0.4);
+            margin-bottom: 1.5rem;
+            cursor: pointer;
         }
 
         .download-btn:hover {
@@ -155,7 +158,6 @@
         
         .github-link {
             display: block;
-            margin-top: 1.5rem;
             color: var(--text-dim);
             font-family: 'Fira Code', monospace;
             font-size: 0.9rem;
@@ -279,11 +281,12 @@
         
         <main id="latest" class="section active">
             <div class="hero">
-                <div class="version-badge">MARK 2 [STABLE]</div>
+                <div id="version-badge" class="version-badge">LOCATING LATEST MARK...</div>
+                
                 <h1>The Neural Core</h1>
                 <p>The most advanced, unrestricted version of J.A.R.V.I.S. to date. Features deep OS integration, dynamic HUD loop fixes, API health diagnostics, and spontaneous personality routines.</p>
                 
-                <a href="https://github.com/bizbobotwitch/Jarvis/releases/latest" class="download-btn" target="_blank">GET THE LATEST CORE</a>
+                <a href="#" id="main-download-btn" class="download-btn" download>DOWNLOAD LATEST CORE</a>
                 
                 <a href="https://github.com/bizbobotwitch/Jarvis" class="github-link" target="_blank">View Source Code on GitHub</a>
             </div>
@@ -309,21 +312,20 @@
             <p style="color: var(--text-dim); margin-bottom: 2rem;">Access legacy builds and developmental milestones of the J.A.R.V.I.S. framework.</p>
             
             <div class="archive-grid">
-                
                 <div class="archive-item">
                     <div class="archive-info">
                         <h3>Mark 1 <span>[Legacy Build]</span></h3>
                         <p>The original foundation of the J.A.R.V.I.S. neural framework.</p>
                     </div>
-                    <a href="https://github.com/bizbobotwitch/Jarvis/releases" class="archive-btn" target="_blank">View on GitHub</a>
+                    <a href="https://api.github.com/repos/bizbobotwitch/Jarvis/zipball/Model" class="archive-btn" download>Download</a>
                 </div>
-
             </div>
         </main>
 
     </div>
 
     <script>
+        // Tab Switching Logic
         function showSection(sectionId) {
             document.querySelectorAll('.section').forEach(section => {
                 section.classList.remove('active');
@@ -336,6 +338,38 @@
             document.getElementById(sectionId).classList.add('active');
             document.getElementById('link-' + sectionId).classList.add('active');
         }
+
+        // --- THE SILENT DIRECT-DOWNLOADER MAGIC ---
+        fetch('https://api.github.com/repos/bizbobotwitch/Jarvis/releases/latest')
+            .then(response => response.json())
+            .then(data => {
+                if (data) {
+                    let directDownloadUrl = data.zipball_url; // Default to the source code zip
+                    
+                    // IF you attached a specific .zip file to the release (like JARVIS_Export.zip), it prioritizes that one!
+                    if (data.assets && data.assets.length > 0) {
+                        const zipAsset = data.assets.find(asset => asset.name.endsWith('.zip'));
+                        if (zipAsset) {
+                            directDownloadUrl = zipAsset.browser_download_url;
+                        }
+                    }
+
+                    // Attach the pure download link
+                    const btn = document.getElementById('main-download-btn');
+                    btn.href = directDownloadUrl;
+                    
+                    // Update the pink badge at the top
+                    if (data.name) {
+                        document.getElementById('version-badge').innerText = data.name.toUpperCase() + " [STABLE]";
+                    } else if (data.tag_name) {
+                        document.getElementById('version-badge').innerText = data.tag_name.toUpperCase() + " [STABLE]";
+                    }
+                }
+            })
+            .catch(error => {
+                console.log('Could not fetch the latest release from GitHub:', error);
+                document.getElementById('version-badge').innerText = "LATEST VERSION";
+            });
     </script>
 </body>
 </html>
