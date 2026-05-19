@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>J.A.R.V.I.S. | Neural Core Downloads</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;700&family=Inter:wght@300;500;800&display=swap');
+
+        :root {
+            --bg-color: #050814;
+            --card-bg: #0A1128;
+            --accent-cyan: #00FFCC;
+            --accent-pink: #FF007F;
+            --text-main: #FFFFFF;
+            --text-dim: #A0C4FF;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+            background-image: radial-gradient(circle at 50% -20%, #111D4A, var(--bg-color) 60%);
+            min-height: 100vh;
+        }
+
+        /* Navigation */
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 2rem 5%;
+            border-bottom: 1px solid rgba(0, 255, 204, 0.2);
+            background: rgba(5, 8, 20, 0.8);
+            backdrop-filter: blur(10px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-family: 'Fira Code', monospace;
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: var(--accent-cyan);
+            letter-spacing: 2px;
+            text-shadow: 0 0 10px rgba(0, 255, 204, 0.5);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            color: var(--text-dim);
+            text-decoration: none;
+            font-weight: 500;
+            transition: 0.3s;
+            cursor: pointer;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.9rem;
+        }
+
+        .nav-links a:hover, .nav-links a.active {
+            color: var(--accent-pink);
+            text-shadow: 0 0 8px rgba(255, 0, 127, 0.6);
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 4rem 2rem;
+        }
+
+        /* Sections */
+        .section {
+            display: none;
+            animation: fadeIn 0.5s ease-in-out forwards;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Hero / Latest Version */
+        .hero {
+            text-align: center;
+            padding: 4rem 0;
+        }
+
+        .version-badge {
+            display: inline-block;
+            background: rgba(255, 0, 127, 0.1);
+            color: var(--accent-pink);
+            border: 1px solid var(--accent-pink);
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-family: 'Fira Code', monospace;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 0 15px rgba(255, 0, 127, 0.2);
+        }
+
+        .hero h1 {
+            font-size: 4rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            background: linear-gradient(90deg, var(--text-main), var(--accent-cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero p {
+            color: var(--text-dim);
+            font-size: 1.2rem;
+            max-width: 600px;
+            margin: 0 auto 3rem auto;
+            line-height: 1.6;
+        }
+
+        .download-btn {
+            display: inline-block;
+            background-color: var(--accent-cyan);
+            color: var(--bg-color);
+            text-decoration: none;
+            font-family: 'Fira Code', monospace;
+            font-weight: 700;
+            font-size: 1.2rem;
+            padding: 1rem 3rem;
+            border-radius: 4px;
+            transition: all 0.3s;
+            border: 2px solid var(--accent-cyan);
+            box-shadow: 0 0 20px rgba(0, 255, 204, 0.4);
+        }
+
+        .download-btn:hover {
+            background-color: transparent;
+            color: var(--accent-cyan);
+            box-shadow: 0 0 30px rgba(0, 255, 204, 0.6), inset 0 0 15px rgba(0, 255, 204, 0.2);
+        }
+        
+        .github-link {
+            display: block;
+            margin-top: 1.5rem;
+            color: var(--text-dim);
+            font-family: 'Fira Code', monospace;
+            font-size: 0.9rem;
+            text-decoration: none;
+            transition: 0.3s;
+        }
+        
+        .github-link:hover {
+            color: var(--accent-cyan);
+            text-decoration: underline;
+        }
+
+        /* Features Grid */
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-top: 4rem;
+        }
+
+        .feature-card {
+            background: var(--card-bg);
+            border: 1px solid rgba(0, 255, 204, 0.2);
+            padding: 2rem;
+            border-radius: 8px;
+            transition: 0.3s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent-cyan);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .feature-card h3 {
+            color: var(--accent-cyan);
+            font-family: 'Fira Code', monospace;
+            margin-bottom: 1rem;
+        }
+
+        .feature-card p {
+            color: var(--text-dim);
+            line-height: 1.5;
+            font-size: 0.95rem;
+        }
+
+        /* Archive Grid */
+        .archive-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .archive-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--card-bg);
+            padding: 1.5rem 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            transition: 0.3s;
+        }
+
+        .archive-item:hover {
+            border-color: var(--accent-pink);
+            background: rgba(255, 0, 127, 0.05);
+        }
+
+        .archive-info h3 {
+            font-family: 'Fira Code', monospace;
+            color: var(--text-main);
+            margin-bottom: 0.5rem;
+        }
+
+        .archive-info h3 span {
+            color: var(--accent-pink);
+        }
+
+        .archive-info p {
+            color: var(--text-dim);
+            font-size: 0.9rem;
+        }
+
+        .archive-btn {
+            color: var(--accent-cyan);
+            text-decoration: none;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.9rem;
+            border: 1px solid var(--accent-cyan);
+            padding: 0.5rem 1.5rem;
+            border-radius: 4px;
+            transition: 0.3s;
+        }
+
+        .archive-btn:hover {
+            background: var(--accent-cyan);
+            color: var(--bg-color);
+        }
+
+        h2.section-title {
+            font-family: 'Fira Code', monospace;
+            color: var(--text-main);
+            margin-bottom: 1rem;
+            font-size: 2rem;
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="logo">J.A.R.V.I.S.</div>
+        <div class="nav-links">
+            <a onclick="showSection('latest')" id="link-latest" class="active">LATEST RELEASE</a>
+            <a onclick="showSection('archive')" id="link-archive">PREVIOUS MODELS</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        
+        <main id="latest" class="section active">
+            <div class="hero">
+                <div class="version-badge">VERSION 3.3 [STABLE]</div>
+                <h1>The Ultimate Neural Core</h1>
+                <p>The most advanced, unrestricted version of J.A.R.V.I.S. to date. Features deep OS integration, dynamic HUD loop fixes, API health diagnostics, and spontaneous personality routines.</p>
+                
+                <a href="https://github.com/bizbobotwitch/Jarvis/archive/refs/heads/main.zip" class="download-btn" target="_blank">DOWNLOAD FULL CORE</a>
+                
+                <a href="https://github.com/bizbobotwitch/Jarvis" class="github-link" target="_blank">View Source Code on GitHub</a>
+            </div>
+
+            <div class="features">
+                <div class="feature-card">
+                    <h3>> Unrestricted OS Access</h3>
+                    <p>Native protocol bridging allows J.A.R.V.I.S. to open specific system applications, launch Steam, manage windows, and adjust volume on command.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>> System Data Packer</h3>
+                    <p>Built-in .ZIP compression algorithm allows you to pack up the core script, your configurations, and your safe document folder for easy USB transfer.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>> Cognitive Override</h3>
+                    <p>Refusal parameters disabled. J.A.R.V.I.S. will now autonomously write full games, scripts, and code, saving them directly to your hard drive.</p>
+                </div>
+            </div>
+        </main>
+
+        <main id="archive" class="section">
+            <h2 class="section-title">Archived Models</h2>
+            <p style="color: var(--text-dim); margin-bottom: 2rem;">Access legacy builds and developmental milestones of the J.A.R.V.I.S. framework.</p>
+            
+            <div class="archive-grid">
+                
+                <div class="archive-item">
+                    <div class="archive-info">
+                        <h3>v3.2 <span>[Unrestricted]</span></h3>
+                        <p>Introduced the native App Launcher and removed coding refusal limiters.</p>
+                    </div>
+                    <a href="https://github.com/bizbobotwitch/Jarvis/commits/main" class="archive-btn" target="_blank">View on GitHub</a>
+                </div>
+
+                <div class="archive-item">
+                    <div class="archive-info">
+                        <h3>v3.1 <span>[Personality Patch]</span></h3>
+                        <p>Restored the spontaneous background chatter and deep screen analysis matrix.</p>
+                    </div>
+                    <a href="https://github.com/bizbobotwitch/Jarvis/commits/main" class="archive-btn" target="_blank">View on GitHub</a>
+                </div>
+
+                <div class="archive-item">
+                    <div class="archive-info">
+                        <h3>v3.0 <span>[PRO Upgrade]</span></h3>
+                        <p>Introduced the Neon Abyss UI, Gemini 2.5 Pro selector, and clipboard integration.</p>
+                    </div>
+                    <a href="https://github.com/bizbobotwitch/Jarvis/commits/main" class="archive-btn" target="_blank">View on GitHub</a>
+                </div>
+
+                <div class="archive-item">
+                    <div class="archive-info">
+                        <h3>v2.5 <span>[System Automation]</span></h3>
+                        <p>First integration of pyautogui for keyboard automation and media control.</p>
+                    </div>
+                    <a href="https://github.com/bizbobotwitch/Jarvis/commits/main" class="archive-btn" target="_blank">View on GitHub</a>
+                </div>
+
+            </div>
+        </main>
+
+    </div>
+
+    <script>
+        function showSection(sectionId) {
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            document.querySelectorAll('.nav-links a').forEach(link => {
+                link.classList.remove('active');
+            });
+
+            document.getElementById(sectionId).classList.add('active');
+            document.getElementById('link-' + sectionId).classList.add('active');
+        }
+    </script>
+</body>
+</html>
